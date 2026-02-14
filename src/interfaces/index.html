@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDBD - Admin</title>
+    <link rel="stylesheet" href="./main.css">
+</head>
+<body>
+    <h1>ADMINISTRADOR DE NODO</h1>
+    <div class="cabecera-info">
+        <h2 id="nodo-status">Estado de nodo: UNDEFINED</h2>
+        <button id="levantar">Conectar</button>
+    </div>
+
+    <button id="refrescar-status">REFRESCAR STATUS</button>
+
+    <div class="ndbd-info">
+        <h2 id="mysqld-status">Estado de MySQL: UNDEFINED</h2>
+        <button id="mysqld">Conectar</button>
+    </div>
+
+    <h2>CRUD DE PRUEBAS PARA BD COMPARTIDA</h2>
+
+    <form class="input-bd">
+        <input id="input-nombre" type="text" placeholder="nombre" required>
+        <input id="input-email" type="email" placeholder="correo@email.com" required>
+        <input id="input-edad" type="number" placeholder="edad" required>
+        <button id="insertar" type="button">
+            Insertar
+        </button>
+    </form>
+
+    <div class="tabla-info" id="tablaBD">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Edad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script src="../scripts/index.js"></script>
+</body>
+</html>

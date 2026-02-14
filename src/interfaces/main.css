@@ -1,0 +1,180 @@
+/*
+    ! Variables root
+*/
+
+:root {
+    --tema-fondo: #37353E;
+    --color-texto: #D3DAD9;
+    --color-btn: #1B3C53;
+    --color-negativo: #740A03;
+}
+
+/*
+    ? Estilos generales (componenetes)
+*/
+
+body {
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--tema-fondo);
+
+    overflow-x: hidden;
+}
+
+h1 {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    color: var(--color-texto);
+}
+
+h2 {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    color: var(--color-texto);
+}
+
+button {
+    height: 3rem;
+    width: fit-content;
+    border-radius: 30px;
+
+    font-size: 1rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 600;
+    color: var(--color-texto);
+    background-color: var(--color-btn);
+    border-style: solid;
+    border-color: var(--color-btn);
+    cursor: pointer;
+    padding: 10px;
+    transition: border-color 0.3s ease;
+}
+
+button:hover {
+    border-color: var(--color-texto);
+}
+
+input {
+    height: 2rem;
+    padding: 5px;
+
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 600;
+    border-radius: 20px;
+    border-style: none;
+    text-align: center;
+}
+
+th {
+    border-color: var(--color-texto);
+    border-style: solid;
+    border-width: 1px;
+    
+    background-color: var(--color-btn);
+    color: var(--color-texto);
+    width: 12rem;
+    height: 2rem;
+
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+td {
+    border-color: var(--color-texto);
+    border-style: solid;
+    border-width: 1px;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    color: var(--color-texto);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    height: 2rem;
+}
+
+/*
+    ? Estilos de clases
+*/
+
+.cabecera-info {
+    display: flex;
+    flex-direction: row;
+    gap: 3rem;
+    padding: 1rem;
+
+    margin: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 8px 5px rgba(250, 250, 250, 0.2);
+
+    align-items: center;
+    justify-content: center;
+}
+
+.ndbd-info {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+
+    margin: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-bd {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.tabla-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem;
+}
+
+.apagado {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.eliminar {
+    background-color: var(--color-negativo);
+    border-radius: 10px;
+    width: 10rem;
+    margin: 4px;
+}
+
+.editar {
+    background-color: var(--color-btn);
+    border-radius: 10px;
+    width: 10rem;
+    margin: 4px;
+}
+
+.guardar {
+    background-color: var(--color-btn);
+    border-radius: 10px;
+    width: 10rem;
+    margin: 4px;
+}
+
+.edicion-inline {
+    background-color: var(--tema-fondo);
+    color: var(--color-texto);
+    width: 10rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    border-style: none;
+
+    box-shadow: 0 0 8px 5px rgba(250, 250, 250, 0.2);
+}

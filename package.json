@@ -1,0 +1,28 @@
+{
+  "name": "ndbd-app",
+  "version": "1.0.0",
+  "description": "App de electron para vista y manejo simple de los nodos de datos",
+  "main": "./src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wnvp-softwares/ndbd-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wnvp-softwares/ndbd-app/issues"
+  },
+  "homepage": "https://github.com/wnvp-softwares/ndbd-app#readme",
+  "devDependencies": {
+    "electron": "^40.4.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "mysql2": "^3.17.1"
+  }
+}
