@@ -83,7 +83,10 @@ ipcMain.handle("levantar-ndbd", async () => {
             if (error) {
                 status.ndbd = false;
                 status.mysql = false;
-                resolve({ error: true });
+                resolve({ 
+                    error: true,
+                    status
+                });
             } else {
                 data = stdout;
                 const statusActual = await refrescar();

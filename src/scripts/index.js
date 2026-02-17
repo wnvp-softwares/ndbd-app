@@ -4,21 +4,39 @@ const refrescar = document.getElementById("refrescar-status");
 const mysqldH = document.getElementById("mysqld-status");
 const mysqld = document.getElementById("mysqld");
 
+// TODO: Refactorizar index para hacerlo reutilizable
+
 levantar.addEventListener("click", async () => {
     const resultado = await window.api.levantarNodo();
 
-    nodoH.innerText = `Estado de nodo: ${resultado.status ? "ENCENDIDO" : "APAGADO"}`;
-    mysqldH.innerText = `Estado de MySQL: ${resultado.status ? "ENCENDIDO" : "APAGADO"}`;
+    nodoH.innerText = `Estado de nodo: ${resultado.status.ndbd ? "ENCENDIDO" : "APAGADO"}`;
+    mysqldH.innerText = `Estado de MySQL: ${resultado.status.mysql ? "ENCENDIDO" : "APAGADO"}`;
+
+    if (resultado.status.ndbd) levantar.classList.add("apagado");
+    else levantar.classList.remove("apagado");
+
+    if (resultado.status.mysql) { 
+        mysqld.classList.add("apagado");
+        cargarDatos();
+    } else mysqld.classList.remove("apagado");
 });
 
 refrescar.addEventListener("click", async () => {
     const resultado = await window.api.refrescarStatus();
-    nodoH.innerText = `Estado de nodo: ${resultado.status ? "ENCENDIDO" : "APAGADO"}`;
-    mysqldH.innerText = `Estado de MySQL: ${resultado.status ? "ENCENDIDO" : "APAGADO"}`;
+    nodoH.innerText = `Estado de nodo: ${resultado.status.ndbd ? "ENCENDIDO" : "APAGADO"}`;
+    mysqldH.innerText = `Estado de MySQL: ${resultado.status.mysql ? "ENCENDIDO" : "APAGADO"}`;
+
+    if (resultado.status.ndbd) levantar.classList.add("apagado");
+    else levantar.classList.remove("apagado");
+
+    if (resultado.status.mysql) { 
+        mysqld.classList.add("apagado");
+        cargarDatos();
+    } else mysqld.classList.remove("apagado");
 });
 
 mysqld.addEventListener("click", async () => {
-    const resultado = await window.api.conectarMysqld();
+    const resultado = await window.api.conectar-mysqld();
     mysqldH.innerText = `Estado de MySQL: ${!resultado.error ? "ENCENDIDO" : "APAGADO"}`;
 
     cargarDatos();
