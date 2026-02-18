@@ -57,11 +57,8 @@ app.on("window-all-closed", () => {
 
 // Variables de uso medido
 
-const NDBD_COMMAND = "ndbd.exe --defaults-file=C:/mysql-cluster/my.cnf";
+const NDBD_COMMAND = "ndbd.exe --ndb-connectstring=192.168.0.100:1186";
 const NDBD_CWD = "C:/mysql-cluster/bin";
-
-const NDB_MGM_COMMAND = 'ndb_mgm.exe -e "show"';
-const NDB_MGM_CWD = "C:/mysql-cluster/bin";
 
 const procesos = {
     ndbd: null,
@@ -79,20 +76,34 @@ let data = "";
 
 ipcMain.handle("levantar-ndbd", async () => {
     return new Promise((resolve) => {
-        procesos.ndbd = exec(NDBD_COMMAND, { cwd: NDBD_CWD }, async (error, stdout) => {
-            if (error) {
+        // Levantar proceso ndbd
+        procesos.ndbd = exec(NDBD_COMMAND, { cwd: NDBD_CWD }, async (error, stdout, stderr) => {
+            const output = stdout + stderr; // Capturamos stdout y stderr
+
+            if (error || output.includes("ERROR")) {
                 status.ndbd = false;
                 status.mysql = false;
-                resolve({ 
+                resolve({
                     error: true,
-                    status
+                    status,
+                    output
                 });
             } else {
-                data = stdout;
-                const statusActual = await refrescar();
+                // Validamos si contiene "allocated"
+                status.ndbd = output.includes("allocated") && !output.includes("ERROR");
+
+                // Revisamos conexión a MySQL
+                try {
+                    await pool.query("SELECT 1");
+                    status.mysql = true;
+                } catch {
+                    status.mysql = false;
+                }
+
                 resolve({
                     error: false,
-                    status: statusActual
+                    status,
+                    output
                 });
             }
         });
@@ -102,39 +113,22 @@ ipcMain.handle("levantar-ndbd", async () => {
 // Metodo para refrescar el status del nodo y mysql
 
 async function refrescar() {
-    return new Promise((resolve) => {
-        exec(NDB_MGM_COMMAND, { cwd: NDB_MGM_CWD }, async (error, stdout) => {
-            if (error) {
-                status.ndbd = false;
-                resolve({ 
-                    error: true,
-                    status
-                });
-            } else {
-                data = stdout;
-                const lines = data.split(/\r?\n/);
+    return new Promise(async (resolve) => {
+        // Si el proceso ndbd ya está corriendo, usamos su output
+        const output = data || "";
 
-                status.ndbd = false;
-                status.mysql = false;
+        status.ndbd = output.includes("allocated") && !output.includes("ERROR");
 
-                const nodoNumber = Number(process.env.NODE_ID);
+        try {
+            await pool.query("SELECT 1");
+            status.mysql = true;
+        } catch {
+            status.mysql = false;
+        }
 
-                for (const line of lines) {
-                    if (line.includes(`id=${nodoNumber}`) && line.includes("@")) status.ndbd = true;
-                }
-
-                try {
-                    await pool.query("SELECT 1");
-                    status.mysql = true;
-                } catch {
-                    status.mysql = false;
-                }
-
-                resolve({
-                    output:stdout,
-                    status
-                });
-            }
+        resolve({
+            output,
+            status
         });
     });
 }
