@@ -1,4 +1,4 @@
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const { BrowserWindow, app, ipcMain } = require('electron');
 const path = require('path');
 const mysql = require('mysql2/promise');
@@ -57,18 +57,18 @@ app.on("window-all-closed", () => {
 
 // Variables de uso medido
 
-const NDBD_COMMAND = "ndbd.exe --ndb-connectstring=192.168.0.100:1186";
+const NDBD_PATH = "ndbd.exe";
+const NDBD_ARGS = ["--ndb-connectstring=127.0.0.1:1186"];
 const NDBD_CWD = "C:/mysql-cluster/bin";
 
 const procesos = {
     ndbd: null,
-    mysql: null,
 };
 
 const status = {
     ndbd: false,
     mysql: false
-}
+};
 
 let data = "";
 
@@ -76,37 +76,65 @@ let data = "";
 
 ipcMain.handle("levantar-ndbd", async () => {
     return new Promise((resolve) => {
-        // Levantar proceso ndbd
-        procesos.ndbd = exec(NDBD_COMMAND, { cwd: NDBD_CWD }, async (error, stdout, stderr) => {
-            const output = stdout + stderr; // Capturamos stdout y stderr
 
-            if (error || output.includes("ERROR")) {
-                status.ndbd = false;
-                status.mysql = false;
-                resolve({
-                    error: true,
-                    status,
-                    output
-                });
-            } else {
-                // Validamos si contiene "allocated"
-                status.ndbd = output.includes("allocated") && !output.includes("ERROR");
+        if (procesos.ndbd) {
+            return resolve({
+                error: false,
+                status,
+                message: "El nodo ya está corriendo"
+            });
+        }
 
-                // Revisamos conexión a MySQL
-                try {
-                    await pool.query("SELECT 1");
-                    status.mysql = true;
-                } catch {
-                    status.mysql = false;
-                }
+        data = "";
+        status.ndbd = false;
 
-                resolve({
-                    error: false,
-                    status,
-                    output
-                });
+        procesos.ndbd = spawn(NDBD_PATH, NDBD_ARGS, {
+            cwd: NDBD_CWD
+        });
+
+        procesos.ndbd.stdout.on("data", (chunk) => {
+            const output = chunk.toString();
+            data += output;
+            console.log(output);
+
+            if (output.includes("allocated") && !output.includes("ERROR")) {
+                status.ndbd = true;
             }
         });
+
+        procesos.ndbd.stderr.on("data", (chunk) => {
+            const output = chunk.toString();
+            data += output;
+            console.error(output);
+
+            if (output.includes("ERROR")) {
+                status.ndbd = false;
+            }
+        });
+
+        procesos.ndbd.on("exit", (code) => {
+            console.log("ndbd terminó con código:", code);
+            status.ndbd = false;
+            procesos.ndbd = null;
+        });
+
+        // Esperamos 2 segundos para evaluar estado inicial
+        setTimeout(async () => {
+
+            try {
+                await pool.query("SELECT 1");
+                status.mysql = true;
+            } catch {
+                status.mysql = false;
+            }
+
+            resolve({
+                error: false,
+                status,
+                output: data
+            });
+
+        }, 2000);
     });
 });
 
@@ -134,7 +162,24 @@ async function refrescar() {
 }
 
 ipcMain.handle("refrescar-status", async () => {
-    return refrescar();
+
+    // Validar si el proceso sigue vivo
+    if (!procesos.ndbd || procesos.ndbd.killed) {
+        status.ndbd = false;
+    }
+
+    // Validar MySQL
+    try {
+        await pool.query("SELECT 1");
+        status.mysql = true;
+    } catch {
+        status.mysql = false;
+    }
+
+    return {
+        status,
+        output: data
+    };
 });
 
 // Obtener datos de la base de datos
@@ -201,7 +246,7 @@ ipcMain.handle("conectar-mysql", async () => {
 app.on("before-quit", () => {
     console.log("Cerrando procesos del nodo...");
 
-    if (procesos.ndbd && procesos.ndbd.pid) {
-        exec(`taskkill /PID ${procesos.ndbd.pid} /T /F`);
+    if (procesos.ndbd) {
+        procesos.ndbd.kill();
     }
 });
